@@ -4,7 +4,7 @@ export type Picture = {
   tags: string[]
   timestamp: Date
 }
-export type SelectionType = "selected" | "maybe" | "no"
+export type SelectionType = "selected" | "maybe" | "rejected"
 
 export const selectionTypeToTag = (type: SelectionType) => {
   switch (type) {
@@ -12,7 +12,7 @@ export const selectionTypeToTag = (type: SelectionType) => {
       return "Yellow"
     case "selected":
       return "Green"
-    case "no":
+    case "rejected":
       return undefined
   }
 }
@@ -24,6 +24,6 @@ export const tagToSelectionType = (tag: string): SelectionType => {
     case "Green":
       return "selected"
     default:
-      return "no"
+      return "rejected"
   }
 }

@@ -1,6 +1,14 @@
-import React, { KeyboardEvent, useEffect, useMemo, useState } from "react"
-import "./App.css"
+import React, {
+  KeyboardEvent,
+  createRef,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
+import Zoom from "react-medium-image-zoom"
+import "react-medium-image-zoom/dist/styles.css"
 
+import "./App.css"
 import {
   pictureURI,
   readAndSortPicturesFromDisk,
@@ -15,10 +23,13 @@ import {
   selectionTypeToTag,
   tagToSelectionType,
 } from "./types"
+import { PictureDetails } from "./PictureDetails"
+import { SelectionDetails } from "./SelectionDetails"
 
 const App = () => {
   const [allPictures, setAllPictures] = useState<Picture[]>([])
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
+  const selectedThumbnail = createRef<HTMLDivElement>()
 
   useEffect(() => {
     readAndSortPicturesFromDisk().then(setAllPictures).catch(console.error)
@@ -40,24 +51,32 @@ const App = () => {
       }).length,
     [allPictures]
   )
-  const noCount = useMemo(
+  const rejectedCount = useMemo(
     () =>
       filterPictures(allPictures, {
-        selectionType: "no",
+        selectionType: "rejected",
       }).length,
     [allPictures]
   )
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const scrollThumbnailIntoView = () =>
+      selectedThumbnail.current?.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+      })
+
     if (e.key === "ArrowLeft") {
       e.preventDefault()
 
       selectedIndex - 1 >= 0 && setSelectedIndex(selectedIndex - 1)
+      scrollThumbnailIntoView()
     } else if (e.key === "ArrowRight") {
       e.preventDefault()
 
       selectedIndex + 1 <= pictures.length - 1 &&
         setSelectedIndex(selectedIndex + 1)
+      scrollThumbnailIntoView()
     } else if (e.key === " ") {
       e.preventDefault()
 
@@ -160,6 +179,7 @@ const App = () => {
           pictures={pictures}
           selectedIndex={selectedIndex}
           setSelectedIndex={setSelectedIndex}
+          selectedRef={selectedThumbnail}
         />
         <div
           style={{
@@ -171,18 +191,42 @@ const App = () => {
           }}
         >
           {pictures[selectedIndex] && (
-            <img
-              src={pictureURI(pictures[selectedIndex])}
-              alt={pictures[selectedIndex].name}
+            <div
               style={{
-                maxHeight: "calc(100vh - 280px)",
-                maxWidth: "calc(100vw - 100px)",
+                display: "flex",
+                flexDirection: "row",
               }}
-            ></img>
+            >
+              <Zoom>
+                <img
+                  src={pictureURI(pictures[selectedIndex])}
+                  alt={pictures[selectedIndex].name + ""}
+                  style={{
+                    maxHeight: "calc(100vh - 280px)",
+                    maxWidth: "calc(100vw - 100px)",
+                  }}
+                ></img>
+              </Zoom>
+              <div
+                style={{
+                  padding: "10px",
+                  color: "#cdd6f4",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  width: "250px",
+                }}
+              >
+                <PictureDetails picture={pictures[selectedIndex]} />
+                <SelectionDetails
+                  selectedCount={selectedCount}
+                  rejectedCount={rejectedCount}
+                  maybeCount={maybeCount}
+                  totalCount={totalCount}
+                />
+              </div>
+            </div>
           )}
-          <div style={{}}>
-            <span></span>
-          </div>
         </div>
       </div>
     </div>

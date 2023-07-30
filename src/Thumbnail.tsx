@@ -1,6 +1,6 @@
 import { Picture } from "./types"
 
-import React, { FC } from "react"
+import React, { FC, LegacyRef } from "react"
 import { pictureURI } from "./pictureOps"
 import { Tags } from "./Tags"
 
@@ -9,6 +9,7 @@ type Props = {
   currentIndex: number
   selectedIndex: number
   setSelectedIndex: (v: number) => void
+  selectedRef?: LegacyRef<HTMLDivElement>
 }
 
 export const Thumbnail: FC<Props> = ({
@@ -16,14 +17,15 @@ export const Thumbnail: FC<Props> = ({
   currentIndex,
   selectedIndex,
   setSelectedIndex,
+  selectedRef,
 }: Props) => {
   return (
     <div
-      // key={`thumbnail-${index}`}
       style={{
         display: "inline",
         position: "relative",
       }}
+      ref={selectedIndex === currentIndex ? selectedRef : undefined}
     >
       <img
         src={pictureURI(picture)}
@@ -35,6 +37,7 @@ export const Thumbnail: FC<Props> = ({
           margin: "10px 10px 10px 0px",
         }}
         onClick={() => setSelectedIndex(currentIndex)}
+        loading="lazy"
       ></img>
       <Tags picture={picture} />
     </div>

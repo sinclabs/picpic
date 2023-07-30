@@ -1,6 +1,6 @@
 import { Picture } from "./types"
 
-import React, { FC, KeyboardEventHandler } from "react"
+import React, { FC, KeyboardEventHandler, LegacyRef } from "react"
 import { Thumbnail } from "./Thumbnail"
 
 export const FilmRoll: FC<{
@@ -9,12 +9,14 @@ export const FilmRoll: FC<{
   pictures: Picture[]
   selectedIndex: number
   setSelectedIndex: (v: number) => void
+  selectedRef: LegacyRef<HTMLDivElement>
 }> = ({
   gridAreaName,
   handleKeyDown,
   pictures,
   selectedIndex,
   setSelectedIndex,
+  selectedRef,
 }) => {
   return (
     <div
@@ -35,6 +37,7 @@ export const FilmRoll: FC<{
           currentIndex={index}
           selectedIndex={selectedIndex}
           setSelectedIndex={setSelectedIndex}
+          selectedRef={selectedRef}
         />
       ))}
     </div>
