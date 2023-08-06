@@ -29,13 +29,22 @@ import { SelectionDetails } from "./SelectionDetails"
 const App = () => {
   const [allPictures, setAllPictures] = useState<Picture[]>([])
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
+  const [selectionFilter, setSelectionFilter] = useState<
+    SelectionType | undefined
+  >(undefined)
   const selectedThumbnail = createRef<HTMLDivElement>()
 
   useEffect(() => {
     readAndSortPicturesFromDisk().then(setAllPictures).catch(console.error)
   }, [])
 
-  const pictures = useMemo(() => filterPictures(allPictures), [allPictures])
+  const pictures = useMemo(
+    () =>
+      filterPictures(allPictures, {
+        selectionType: selectionFilter,
+      }),
+    [allPictures, selectionFilter]
+  )
   const totalCount = useMemo(() => allPictures.length, [allPictures])
   const selectedCount = useMemo(
     () =>
@@ -97,7 +106,11 @@ const App = () => {
 
     removeTagOnDisk(tagToRemove, pic.path)
       .then(() => {
-        allPictures[selectedIndex].tags = []
+        let picIndex = selectedIndex
+        if (selectionFilter) {
+          picIndex = allPictures.findIndex((p) => p.path === pic.path)
+        }
+        allPictures[picIndex].tags = []
         setAllPictures([...allPictures])
       })
       .catch(console.error)
@@ -119,7 +132,11 @@ const App = () => {
 
     setTagOnDisk(tag, pic.path)
       .then(() => {
-        allPictures[selectedIndex].tags = [tag]
+        let picIndex = selectedIndex
+        if (selectionFilter) {
+          picIndex = allPictures.findIndex((p) => p.path === pic.path)
+        }
+        allPictures[picIndex].tags = [tag]
         setAllPictures([...allPictures])
       })
       .catch(console.error)
@@ -223,6 +240,8 @@ const App = () => {
                   rejectedCount={rejectedCount}
                   maybeCount={maybeCount}
                   totalCount={totalCount}
+                  selectionFilter={selectionFilter}
+                  setSelectionFilter={setSelectionFilter}
                 />
               </div>
             </div>
