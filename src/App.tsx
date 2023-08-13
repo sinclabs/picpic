@@ -46,10 +46,17 @@ const App = () => {
     [allPictures, selectionFilter]
   )
   const totalCount = useMemo(() => allPictures.length, [allPictures])
-  const selectedCount = useMemo(
+  const selectedMainCount = useMemo(
     () =>
       filterPictures(allPictures, {
-        selectionType: "selected",
+        selectionType: "selected-main",
+      }).length,
+    [allPictures]
+  )
+  const selectedMemoryCount = useMemo(
+    () =>
+      filterPictures(allPictures, {
+        selectionType: "selected-memory",
       }).length,
     [allPictures]
   )
@@ -90,6 +97,10 @@ const App = () => {
       e.preventDefault()
 
       toggleTag()
+    } else if (e.key === "m") {
+      e.preventDefault()
+
+      memoryTag()
     } else if (e.key === "x") {
       e.preventDefault()
 
@@ -120,11 +131,31 @@ const App = () => {
     const pic = pictures[selectedIndex]
     const selectionType = tagToSelectionType(pic.tags[0])
 
-    let selectionTypeToSet: SelectionType = "selected"
-    if (selectionType === "selected") {
+    let selectionTypeToSet: SelectionType = "selected-main"
+    if (selectionType === "selected-main") {
       selectionTypeToSet = "maybe"
     }
 
+    const tag = selectionTypeToTag(selectionTypeToSet)
+    if (!tag) {
+      return
+    }
+
+    setTagOnDisk(tag, pic.path)
+      .then(() => {
+        let picIndex = selectedIndex
+        if (selectionFilter) {
+          picIndex = allPictures.findIndex((p) => p.path === pic.path)
+        }
+        allPictures[picIndex].tags = [tag]
+        setAllPictures([...allPictures])
+      })
+      .catch(console.error)
+  }
+
+  const memoryTag = () => {
+    const pic = pictures[selectedIndex]
+    let selectionTypeToSet: SelectionType = "selected-memory"
     const tag = selectionTypeToTag(selectionTypeToSet)
     if (!tag) {
       return
@@ -236,7 +267,8 @@ const App = () => {
               >
                 <PictureDetails picture={pictures[selectedIndex]} />
                 <SelectionDetails
-                  selectedCount={selectedCount}
+                  selectedMainCount={selectedMainCount}
+                  selectedMemoryCount={selectedMemoryCount}
                   rejectedCount={rejectedCount}
                   maybeCount={maybeCount}
                   totalCount={totalCount}

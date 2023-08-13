@@ -59,14 +59,16 @@ const Button: FC<{
 )
 
 export const SelectionDetails: FC<{
-  selectedCount: number
+  selectedMainCount: number
+  selectedMemoryCount: number
   maybeCount: number
   rejectedCount: number
   totalCount: number
   selectionFilter: SelectionType | undefined
   setSelectionFilter: (s: SelectionType | undefined) => void
 }> = ({
-  selectedCount,
+  selectedMainCount,
+  selectedMemoryCount,
   rejectedCount,
   maybeCount,
   totalCount,
@@ -79,10 +81,15 @@ export const SelectionDetails: FC<{
         display: "grid",
         gap: "5px",
         gridTemplateAreas: `
-          "h h h h"
-          "b c d e"
+          "h h"
+          "b c"
+          "d e"
+          "f f"
         `,
         marginBottom: "10px",
+        backgroundColor: "#585b70",
+        padding: "10px",
+        borderRadius: "5px",
       }}
     >
       <div
@@ -103,13 +110,21 @@ export const SelectionDetails: FC<{
       <Button
         gridArea="c"
         backgroundColor="#a6e3a1"
-        isSelected={selectionFilter === "selected"}
-        onClick={() => setSelectionFilter("selected")}
+        isSelected={selectionFilter === "selected-main"}
+        onClick={() => setSelectionFilter("selected-main")}
       >
-        Selected
+        Selected - Main album
       </Button>
       <Button
         gridArea="d"
+        backgroundColor="#cba6f7"
+        isSelected={selectionFilter === "selected-memory"}
+        onClick={() => setSelectionFilter("selected-memory")}
+      >
+        Selected - Memory book
+      </Button>
+      <Button
+        gridArea="e"
         backgroundColor="#f9e2af"
         isSelected={selectionFilter === "maybe"}
         onClick={() => setSelectionFilter("maybe")}
@@ -117,7 +132,7 @@ export const SelectionDetails: FC<{
         Maybe
       </Button>
       <Button
-        gridArea="e"
+        gridArea="f"
         backgroundColor="#f38ba8"
         isSelected={selectionFilter === "rejected"}
         onClick={() => setSelectionFilter("rejected")}
@@ -135,7 +150,16 @@ export const SelectionDetails: FC<{
         gap: "5px",
       }}
     >
-      <CountCard count={selectedCount} title="Selected" background="#a6e3a1" />
+      <CountCard
+        count={selectedMainCount}
+        title="Selected - Main Album"
+        background="#a6e3a1"
+      />
+      <CountCard
+        count={selectedMemoryCount}
+        title="Selected - Memory Book"
+        background="#cba6f7"
+      />
       <CountCard count={maybeCount} title="Maybe" background="#f9e2af" />
       <CountCard count={rejectedCount} title="Rejected" background="#f38ba8" />
       <CountCard count={totalCount} title="Total" background="#89b4fa" />

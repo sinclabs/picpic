@@ -4,8 +4,10 @@ export const PictureDetails = ({ picture }: { picture: Picture }) => {
   const tagColor = (() => {
     const selectionType = tagToSelectionType(picture.tags[0])
     switch (selectionType) {
-      case "selected":
+      case "selected-main":
         return "#a6e3a1"
+      case "selected-memory":
+        return "#cba6f7"
       case "maybe":
         return "#f9e2af"
       case "rejected":
